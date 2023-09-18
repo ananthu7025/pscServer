@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">One-Time Password (OTP) Verification</h1>
+        <p>Hi,</p>
+        <p>To enhance the security of your account, we have implemented Two-Factor Authentication (2FA) for your account. To ensure it's you logging in, we are providing you with a One-Time Password (OTP) via email.</p>
+        <p>Please find your OTP below:</p>
+        <h2>{{otp}}</h2>
+        <p>Enter the OTP accurately and within 10 minutes. It is valid for a single use only and should not be shared with anyone, including our support staff.</p>
+        <p>Thank you for your cooperation.</p>
+        <p>Regards,<br>CompanyName</p>
+    </div>
+</body>
+</html>
