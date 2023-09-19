@@ -113,6 +113,34 @@ async function verifyOTP(req, res, next) {
     next(error);
   }
 }
+async function resendOTP(req, res, next) {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    const currentTime = new Date();
+    const otpCreationTime = new Date(user.otpCreatedAt);
+    const newOTP = generateRandomNumber(1000, 9999);
+    user.otp = newOTP;
+    user.otpCreatedAt = currentTime;
+    await user.save();
+
+    sendOTPByEmail(email, newOTP);
+
+    return res.status(201).send({
+      message: "OTP resent successfully.",
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}
+
 
 function generateAccessToken(user) {
   const accessToken = jwt.sign(
@@ -129,4 +157,5 @@ function generateAccessToken(user) {
 module.exports = {
   registerUser,
   verifyOTP,
+  resendOTP
 };
