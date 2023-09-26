@@ -4,6 +4,33 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
+
+function verifyAccessToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "Access token is missing." });
+  }
+
+  // Extract the token without the "Bearer" prefix
+  const accessToken = authHeader.replace("Bearer ", "");
+
+  const secretKey = "your-secret-key"; // Replace with your actual secret key
+
+  jwt.verify(accessToken, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid access token." });
+    }
+    
+    // If the token is valid, store the decoded user information in the request object
+    req.user = decoded;
+    next();
+  });
+}
+
+
+
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -157,5 +184,6 @@ function generateAccessToken(user) {
 module.exports = {
   registerUser,
   verifyOTP,
-  resendOTP
+  resendOTP,
+  verifyAccessToken
 };
