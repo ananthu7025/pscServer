@@ -1,18 +1,14 @@
 const Result = require('../models/result');
 const Question = require('../models/question');
 
-// Submit quiz answers and calculate score
 const submitQuiz = async (req, res) => {
   try {
     const { userID, answers } = req.body;
-    console.log(answers,"answeer")
     const questions = await Question.find({});
     let score = 0;
 
     for (const answer of answers) {
       const question = questions.find((q) => q._id.toString() === answer.questionID);
-      console.log(question,"questionssss")
-      console.log(question && question.correctAnswer === answer.selectedOption)
 
       if (question && question.correctAnswer === answer.selectedOption) {
         score++;
@@ -28,7 +24,6 @@ const submitQuiz = async (req, res) => {
   }
 };
 
-// Get user's results
 const getUserResults = async (req, res) => {
   try {
     const { userID } = req.params;

@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   district: String,
   isCreated: Boolean,
   referralCode: { type: String, unique: true }, 
+  isAdmin: { type: Boolean,default: false }, 
 });
 
 module.exports = mongoose.model("User", userSchema);

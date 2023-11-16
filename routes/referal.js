@@ -1,4 +1,3 @@
-// In your routes file (e.g., referralRoutes.js or any appropriate file)
 
 const express = require("express");
 const router = express.Router();
@@ -7,10 +6,10 @@ router.get("/referrals", async (req, res, next) => {
     try {
       const allReferrals = await Referral.find().populate({
         path: 'referrer',
-        select: 'email' // Select the 'email' field of the referrer
+        select: 'email' 
       }).populate({
         path: 'referee',
-        select: 'email' // Select the 'email' field of the referee
+        select: 'email' 
       });
   
       const referralEmails = allReferrals.map(referral => {

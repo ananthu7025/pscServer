@@ -8,7 +8,10 @@ const resultRoutes = require('./routes/result');
 const fileUploadRoutes = require('./routes/fileUpload');
 const folderRouter = require('./routes/folder');
 const referralRoutes = require('./routes/referal');
-
+const userRoutesAdmin = require('./routes/admin');
+const CurrentAffaris = require('./routes/currentAffairs');
+const folderFech = require('./routes/folderFetch');
+const studyPlan = require('./routes/studyPlan');
 
 
 const errorHandler = require("./errorHandler");
@@ -24,9 +27,6 @@ mongoose.connect("mongodb://127.0.0.1:27017/PSC?directConnection=true", {
 app.use(bodyParser.json());
 app.use(errorHandler);
 app.use(cors());
-
-
-// Use the file upload routes under a specific path, e.g., '/upload'
 app.use('/', fileUploadRoutes);
 
 app.use("/user", userRoutes);
@@ -35,6 +35,12 @@ app.use('/', questionRoutes);
 app.use('/', resultRoutes);
 app.use('/folders', folderRouter);
 app.use('/', referralRoutes);
+app.use('/admin/users', userRoutesAdmin);
+app.use('/', CurrentAffaris);
+app.use('/', folderFech);
+app.use('/', studyPlan);
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

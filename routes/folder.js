@@ -1,15 +1,13 @@
-// routes/folder.js
 const express = require('express');
 const Folder = require('../models/folders');
 
 const router = express.Router();
 
-// Endpoint to create a folder
 router.post('/', async (req, res) => {
   const { year, month,folderId } = req.body;
 
   try {
-    const newFolder = new Folder({ year, month,folderId /* Add other fields as needed */ });
+    const newFolder = new Folder({ year, month,folderId });
     await newFolder.save();
     res.status(201).json(newFolder);
   } catch (err) {

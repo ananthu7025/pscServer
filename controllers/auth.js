@@ -27,9 +27,8 @@ function verifyAccessToken(req, res, next) {
 }
 
 function generateReferralCode() {
-  let referralCode = ""; // Your code generation logic here
+  let referralCode = "";
 
-  // Example: Generating a random 6-character code
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const codeLength = 6;
 
@@ -52,7 +51,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const OTP_EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+const OTP_EXPIRY_TIME = 5 * 60 * 1000; 
 
 function sendOTPByEmail(email, otp) {
   const mailOptions = {
@@ -130,7 +129,6 @@ async function verifyOTP(req, res, next) {
       }
 
       if (user.isVerified) {
-        // Second attempt to login with OTP, set user.isCreated to true
         user.isCreated = true;
         await user.save();
       } else {
@@ -138,11 +136,9 @@ async function verifyOTP(req, res, next) {
       }
 
       if (!user.referralCode) {
-        // Generate a unique referral code
         user.referralCode = generateReferralCode();
       }
 
-      // Save the updated user with the referral code
       await user.save();
 
       const accessToken = generateAccessToken(user);
@@ -154,7 +150,7 @@ async function verifyOTP(req, res, next) {
           isPaid: user.isPaid,
           userId: user._id,
           isCreated: user.isCreated,
-          referralCode: user.referralCode, // Include referral code in the response
+          referralCode: user.referralCode, 
         },
         accessToken: accessToken,
       });
@@ -187,12 +183,10 @@ async function createProfile(req, res, next) {
     user.district = district;
     user.isCreated = true;
 
-    // Check if the referral code exists and matches any user's referral code
     if (referralCode) {
       const referredUser = await User.findOne({ referralCode });
 
       if (referredUser) {
-        // If a user with the entered referral code exists, create a referral entry
         const referral = new Referral({
           referrer: referredUser._id,
           referee: user._id,
@@ -204,7 +198,6 @@ async function createProfile(req, res, next) {
 
     await user.save();
 
-    // Fetch user details after the profile is created
     const updatedUser = await User.findById(userId);
 
     res.status(201).json({ message: "User profile created successfully.", user: updatedUser });
@@ -264,6 +257,7 @@ async function getUserDetails(req, res, next) {
         return res.status(404).json({ message: "User not found." });
       }
       const userDetails = {
+        _id:user._id,
         email: user.email,
         isVerified: user.isVerified,
         isPaid: user.isPaid,
@@ -272,9 +266,8 @@ async function getUserDetails(req, res, next) {
         district: user.district,
         isCreated: user.isCreated,
         referralCode: user.referralCode,
-        // Add any other details you want to include here
+        isAdmin:user.isAdmin
       };
-
       res.status(200).json(userDetails);
     });
   } catch (error) {
@@ -293,12 +286,38 @@ function generateAccessToken(user) {
   );
   return accessToken;
 }
+async function updateIsPaidStatus(req, res, next) {
+  try {
+    const { userId, isPaid } = req.body;
 
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    user.isPaid = isPaid;
+    await user.save();
+
+    res.status(200).json({
+      message: `isPaid status updated successfully for user ${userId}.`,
+      user: {
+        _id: user._id,
+        email: user.email,
+        isVerified: user.isVerified,
+        isPaid: user.isPaid,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 module.exports = {
   registerUser,
   verifyOTP,
   resendOTP,
   verifyAccessToken,
+  updateIsPaidStatus,
   getUserDetails,
   createProfile
 };

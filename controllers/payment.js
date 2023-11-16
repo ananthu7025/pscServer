@@ -8,7 +8,6 @@ const instance = new Razorpay({
   key_secret: "NzQR1Bt4fjXTDLxrrvSKGbHf",
 });
 
-// Create an order
 const createOrder = async (req, res) => {
   try {
     const options = {
@@ -30,7 +29,6 @@ const createOrder = async (req, res) => {
   }
 };
 
-// Verify payment
 const verifyPayment = async (req, res) => {
     try {
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email } =
@@ -42,7 +40,6 @@ const verifyPayment = async (req, res) => {
         .digest("hex");
   
       if (razorpay_signature === expectedSign) {
-        // Payment verified successfully, update user's isPaid field
         const user = await User.findOne({ email });
   
         if (user) {

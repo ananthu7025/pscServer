@@ -52,7 +52,6 @@ async function uploadFile(authClient, file, parentFolderId) {
   });
 }
 
-// Route for uploading to "Previous Question"
 router.post('/previous-question', upload.single('file'), async (req, res) => {
   try {
     const authClient = await authorize();
@@ -64,7 +63,6 @@ router.post('/previous-question', upload.single('file'), async (req, res) => {
   }
 });
 
-// Route for uploading to "PSC Bulletin"
 router.post('/psc-bulletin', upload.single('file'), async (req, res) => {
   try {
     const authClient = await authorize();
@@ -76,7 +74,6 @@ router.post('/psc-bulletin', upload.single('file'), async (req, res) => {
   }
 });
 
-// Route for uploading to "Syllabus"
 router.post('/syllabus', upload.single('file'), async (req, res) => {
   try {
     const authClient = await authorize();

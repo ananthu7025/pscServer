@@ -8,5 +8,5 @@ router.post("/verify", userController.verifyOTP);
 router.post("/resend-otp", userController.resendOTP);
 router.get("/userDetails",  userController.getUserDetails);
 router.post("/create-profile", userController.createProfile);
-
+router.put("/update-isPaid", userController.updateIsPaidStatus);
 module.exports = router;

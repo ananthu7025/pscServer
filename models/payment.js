@@ -6,7 +6,6 @@ const paymentSchema = new mongoose.Schema({
   paymentId: String,
   amount: Number,
   status: String,
-  // Add other fields as needed
 });
 
 module.exports = mongoose.model('Payment', paymentSchema);
