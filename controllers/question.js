@@ -62,8 +62,6 @@ const getQuestionById = async (req, res) => {
 const deleteQuestion = async (req, res) => {
   try {
     const { questionId } = req.params;
-    console.log("enter")
-
     const question = await Question.findByIdAndDelete(questionId);
 
     if (!question) {

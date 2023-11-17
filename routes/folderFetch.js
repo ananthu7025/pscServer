@@ -11,7 +11,7 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
 const TOKEN_PATH = 'token.json';
 const credentialsPath = './gd.json';
 
-router.get('/api/folder/files', (req, res) => {
+router.get('/folder/files', (req, res) => {
   const { folderId } = req.query;
 
   if (!folderId) {

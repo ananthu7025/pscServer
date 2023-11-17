@@ -27,18 +27,18 @@ mongoose.connect("mongodb://127.0.0.1:27017/PSC?directConnection=true", {
 app.use(bodyParser.json());
 app.use(errorHandler);
 app.use(cors());
-app.use('/', fileUploadRoutes);
+app.use('/api', fileUploadRoutes);
 
-app.use("/user", userRoutes);
+app.use("/api/user", userRoutes);
 app.use('/api/payment', paymentRoutes);
-app.use('/', questionRoutes);
-app.use('/', resultRoutes);
-app.use('/folders', folderRouter);
-app.use('/', referralRoutes);
-app.use('/admin/users', userRoutesAdmin);
-app.use('/', CurrentAffaris);
-app.use('/', folderFech);
-app.use('/', studyPlan);
+app.use('/api', questionRoutes);
+app.use('/api', resultRoutes);
+app.use('/api/folders', folderRouter);
+app.use('/api', referralRoutes);
+app.use('/api/admin/users', userRoutesAdmin);
+app.use('/api', CurrentAffaris);
+app.use('/api', folderFech);
+app.use('/api', studyPlan);
 
 
 app.listen(PORT, () => {

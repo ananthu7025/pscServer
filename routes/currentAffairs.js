@@ -9,7 +9,7 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
 const TOKEN_PATH = 'token.json';
 const credentialsPath = './gd.json';
 
-router.get('/api/files', (req, res) => {
+router.get('/files', (req, res) => {
     const { folderId } = req.query;
     if (!folderId) {
       return res.status(400).json({ error: 'Missing folderId parameter' });

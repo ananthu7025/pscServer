@@ -10,7 +10,7 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
 const TOKEN_PATH = 'token.json';
 const credentialsPath = './gd.json';
 
-router.get('/api/drive/items', async (req, res) => {
+router.get('/drive/items', async (req, res) => {
   const { folderId } = req.query;
 
   if (!folderId) {
