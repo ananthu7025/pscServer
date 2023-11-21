@@ -8,7 +8,6 @@
         "client_secret": "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",
         "redirect_uris": [
             "http://localhost:3000",
-            "https://codesandbox.io/s/lucid-marco-695hs2?file=/src/index.js",
             "http://localhost"
         ],
         "javascript_origins": [

@@ -60,6 +60,7 @@ function getAccessToken(oAuth2Client, callback) {
     access_type: 'offline',
     scope: SCOPES,
   });
+  
   console.log('Authorize this app by visiting this url:', authUrl);
   const rl = readline.createInterface({
     input: process.stdin,
@@ -67,6 +68,7 @@ function getAccessToken(oAuth2Client, callback) {
   });
   rl.question('Enter the code from that page here: ', (code) => {
     rl.close();
+    code = decodeURIComponent(code); 
     oAuth2Client.getToken(code, (err, token) => {
       if (err) return console.error('Error retrieving access token:', err);
       oAuth2Client.setCredentials(token);

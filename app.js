@@ -12,7 +12,8 @@ const userRoutesAdmin = require('./routes/admin');
 const CurrentAffaris = require('./routes/currentAffairs');
 const folderFech = require('./routes/folderFetch');
 const studyPlan = require('./routes/studyPlan');
-
+const categoryRoutes = require('./routes/catogorey');
+const subcategoryRoutes = require('./routes/subcatogorey');
 
 const errorHandler = require("./errorHandler");
 const cors = require("cors");
@@ -39,7 +40,8 @@ app.use('/api/admin/users', userRoutesAdmin);
 app.use('/api', CurrentAffaris);
 app.use('/api', folderFech);
 app.use('/api', studyPlan);
-
+app.use('/api', categoryRoutes);
+app.use('/api', subcategoryRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

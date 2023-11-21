@@ -33,6 +33,31 @@ router.get('/files', (req, res) => {
   });
   
 
+  function getAccessToken(oAuth2Client, callback) {
+    const authUrl = oAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES,
+    });
+    console.log('Authorize this app by visiting this url:', authUrl);
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    rl.question('Enter the code from that page here: ', (code) => {
+      rl.close();
+      code = decodeURIComponent(code); 
+      oAuth2Client.getToken(code, (err, token) => {
+        if (err) return console.error('Error retrieving access token:', err);
+        oAuth2Client.setCredentials(token);
+        fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+          if (err) console.error(err);
+          console.log('Token stored to', TOKEN_PATH);
+        });
+        callback(oAuth2Client);
+      });
+    });
+  }
+  
 function authorize(credentials, callback) {
   const { client_secret, client_id, redirect_uris } = credentials.web;
   const oAuth2Client = new OAuth2Client(client_id, client_secret, redirect_uris[0]);
@@ -44,7 +69,13 @@ function authorize(credentials, callback) {
     }
 
     try {
-      oAuth2Client.setCredentials(JSON.parse(token));
+      const parsedToken = JSON.parse(token);
+      if (isTokenExpired(parsedToken)) {
+        console.log('Token expired, refreshing...');
+        return refreshToken(oAuth2Client, parsedToken, callback);
+      }
+
+      oAuth2Client.setCredentials(parsedToken);
       callback(oAuth2Client);
     } catch (parseError) {
       console.error('Error parsing token file:', parseError);
@@ -53,29 +84,36 @@ function authorize(credentials, callback) {
   });
 }
 
-function getAccessToken(oAuth2Client, callback) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  console.log('Authorize this app by visiting this url:', authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error retrieving access token:', err);
-      oAuth2Client.setCredentials(token);
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
+function isTokenExpired(token) {
+  // Check if the token expiration time is in the past
+  return Date.now() >= token.expiry_date;
+}
+
+function refreshToken(oAuth2Client, oldToken, callback) {
+  console.log('Refreshing token...');
+  console.log('Refreshing token with refresh token:', oldToken.refresh_token);
+console.log('Token expiration time:', new Date(parsedToken.expiry_date).toLocaleString());
+
+  oAuth2Client.refreshToken(oldToken.refresh_token, (err, newToken) => {
+    if (err) {
+      console.error('Error refreshing token:', err);
+      return getAccessToken(oAuth2Client, callback);
+    }
+
+    oAuth2Client.setCredentials(newToken);
+    fs.writeFile(TOKEN_PATH, JSON.stringify(newToken), (err) => {
+      if (err) {
+        console.error('Error storing refreshed token:', err);
+        return getAccessToken(oAuth2Client, callback);
+      }
+
+      console.log('Token refreshed and stored to', TOKEN_PATH);
       callback(oAuth2Client);
     });
   });
 }
+
+
 
 function listFiles(oAuth2Client, folderId, callback) {
   const drive = google.drive({ version: 'v3', auth: oAuth2Client });

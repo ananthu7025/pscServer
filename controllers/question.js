@@ -15,13 +15,24 @@ const createQuestion = async (req, res) => {
 const getQuestions = async (req, res) => {
   try {
     const { category, subCategory } = req.query;
-    const questions = await Question.find({ category, subCategory });
+
+    let query = { category };
+
+    // Check if subCategory is specified, if not, fetch all questions in the category
+    if (!subCategory || subCategory.trim() === '') {
+      delete query.subCategory; // Remove subCategory from the query to fetch all questions in the category
+    } else {
+      query.subCategory = subCategory;
+    }
+
+    const questions = await Question.find(query);
     res.json(questions);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch questions' });
   }
 };
+
 const editQuestion = async (req, res) => {
   try {
     const { questionId } = req.params;
