@@ -36,6 +36,7 @@ router.get('/files', (req, res) => {
   function getAccessToken(oAuth2Client, callback) {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: 'offline',
+      prompt: 'consent', // Ensure user is prompted to reauthorize
       scope: SCOPES,
     });
     console.log('Authorize this app by visiting this url:', authUrl);
@@ -48,6 +49,10 @@ router.get('/files', (req, res) => {
       code = decodeURIComponent(code); 
       oAuth2Client.getToken(code, (err, token) => {
         if (err) return console.error('Error retrieving access token:', err);
+  
+        // Set expiration time to 6 months (in milliseconds)
+        token.expiry_date = Date.now() + 180 * 24 * 60 * 60 * 1000; // 180 days
+  
         oAuth2Client.setCredentials(token);
         fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
           if (err) console.error(err);
@@ -57,6 +62,7 @@ router.get('/files', (req, res) => {
       });
     });
   }
+  
   
 function authorize(credentials, callback) {
   const { client_secret, client_id, redirect_uris } = credentials.web;

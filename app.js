@@ -5,7 +5,7 @@ const userRoutes = require("./routes/auth");
 const paymentRoutes = require('./routes/payment');
 const questionRoutes = require('./routes/question');
 const resultRoutes = require('./routes/result');
-const fileUploadRoutes = require('./routes/fileUpload');
+// const fileUploadRoutes = require('./routes/fileUpload');
 const folderRouter = require('./routes/folder');
 const referralRoutes = require('./routes/referal');
 const userRoutesAdmin = require('./routes/admin');
@@ -28,7 +28,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/PSC?directConnection=true", {
 app.use(bodyParser.json());
 app.use(errorHandler);
 app.use(cors());
-app.use('/api', fileUploadRoutes);
+// app.use('/api', fileUploadRoutes);
 
 app.use("/api/user", userRoutes);
 app.use('/api/payment', paymentRoutes);
