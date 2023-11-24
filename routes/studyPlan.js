@@ -1,31 +1,52 @@
-
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
 const { google } = require('googleapis');
-const readline = require('readline');
+const credentials = require('../gd.json');
 const { OAuth2Client } = require('google-auth-library');
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
-const TOKEN_PATH = 'token.json';
-const credentialsPath = './gd.json';
+const client_id = credentials.web.client_id;
+const client_secret = credentials.web.client_secret;
+const redirect_uris = credentials.web.redirect_uris;
+const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
-router.get('/drive/items', async (req, res) => {
-  const { folderId } = req.query;
+const SCOPE = ['https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.file']
 
-  if (!folderId) {
-    return res.status(400).json({ error: 'Missing folderId parameter' });
-  }
+router.get('/getAuthURL', (req, res) => {
+    const authUrl = oAuth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: SCOPE,
+    });
+    return res.send(authUrl);
+});
 
-  try {
-    const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
-    const oAuth2Client = await authorize(credentials);
-    const data = await fetchDriveItems(oAuth2Client, folderId);
-    res.json(data);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+router.post('/getToken', (req, res) => {
+    if (req.body.code == null) return res.status(400).send('Invalid Request');
+    oAuth2Client.getToken(req.body.code, (err, token) => {
+        if (err) {
+            console.error('Error retrieving access token', err);
+            return res.status(400).send('Error retrieving access token');
+        }
+        res.send(token);
+    });
+});
+
+router.post('/studyplan/:folderId', async (req, res) => {
+    if (req.body.access_token == null) return res.status(400).send('Token not found');
+    
+    const folderId = req.params.folderId;
+
+    if (!folderId) {
+        return res.status(400).send('Folder ID is required');
+    }
+
+    oAuth2Client.setCredentials(req.body.access_token);
+    try {
+        const structuredFolders = await fetchDriveItems(oAuth2Client, folderId);
+        res.json(structuredFolders);
+    } catch (error) {
+        console.error('Error in studyplan route: ', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 async function fetchDriveItems(oAuth2Client, folderId) {
@@ -55,7 +76,7 @@ async function fetchDriveItems(oAuth2Client, folderId) {
     return structuredFolders;
   } catch (error) {
     console.error('Error fetching Google Drive data: ', error);
-    return [];
+    throw new Error('Error fetching Google Drive data');
   }
 }
 
@@ -92,70 +113,6 @@ async function fetchFiles(drive, folderId) {
     console.error('Error fetching files: ', error);
     throw new Error('Error fetching files');
   }
-}
-
-function authorize(credentials) {
-  return new Promise((resolve, reject) => {
-    const { client_secret, client_id, redirect_uris } = credentials.web;
-    const oAuth2Client = new OAuth2Client(client_id, client_secret, redirect_uris[0]);
-
-    fs.readFile(TOKEN_PATH, (err, token) => {
-      if (err) {
-        console.log('No token found, getting a new one...');
-        return getAccessToken(oAuth2Client)
-          .then((token) => {
-            oAuth2Client.setCredentials(token);
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-              if (err) console.error(err);
-              console.log('Token stored to', TOKEN_PATH);
-            });
-            resolve(oAuth2Client);
-          })
-          .catch((err) => reject(err));
-      }
-
-      try {
-        oAuth2Client.setCredentials(JSON.parse(token));
-        resolve(oAuth2Client);
-      } catch (parseError) {
-        console.error('Error parsing token file:', parseError);
-        getAccessToken(oAuth2Client)
-          .then((token) => {
-            oAuth2Client.setCredentials(token);
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-              if (err) console.error(err);
-              console.log('Token stored to', TOKEN_PATH);
-            });
-            resolve(oAuth2Client);
-          })
-          .catch((err) => reject(err));
-      }
-    });
-  });
-}
-
-function getAccessToken(oAuth2Client) {
-  return new Promise((resolve, reject) => {
-    const authUrl = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: SCOPES,
-    });
-    console.log('Authorize this app by visiting this url:', authUrl);
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question('Enter the code from that page here: ', (code) => {
-      rl.close();
-      oAuth2Client.getToken(code, (err, token) => {
-        if (err) {
-          console.error('Error retrieving access token:', err);
-          reject(err);
-        }
-        resolve(token);
-      });
-    });
-  });
 }
 
 module.exports = router;

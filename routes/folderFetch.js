@@ -1,85 +1,18 @@
-// route.js
-
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
 const { google } = require('googleapis');
-const readline = require('readline');
-const { OAuth2Client } = require('google-auth-library');
+const credentials = require('../gd.json');
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
-const TOKEN_PATH = 'token.json';
-const credentialsPath = './gd.json';
+const client_id = credentials.web.client_id;
+const client_secret = credentials.web.client_secret;
+const redirect_uris = credentials.web.redirect_uris;
+const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
-router.get('/folder/files', (req, res) => {
-  const { folderId } = req.query;
-
-  if (!folderId) {
-    return res.status(400).json({ error: 'Missing folderId parameter' });
-  }
-
-  fs.readFile(credentialsPath, 'utf8', (err, content) => {
-    if (err) return res.status(500).json({ error: 'Error reading client secret file' });
-
-    try {
-      const credentials = JSON.parse(content);
-      authorize(credentials, (oAuth2Client) => {
-        listSubfoldersAndFiles(oAuth2Client, folderId, (data) => {
-          res.json(data);
-        });
-      });
-    } catch (parseError) {
-      console.error('Error parsing client secret file:', parseError);
-      res.status(500).json({ error: 'Error parsing client secret file' });
-    }
-  });
-});
-
-function authorize(credentials, callback) {
-  const { client_secret, client_id, redirect_uris } = credentials.web;
-  const oAuth2Client = new OAuth2Client(client_id, client_secret, redirect_uris[0]);
-
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) {
-      console.log('No token found, getting a new one...');
-      return getAccessToken(oAuth2Client, callback);
-    }
-
-    try {
-      oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client);
-    } catch (parseError) {
-      console.error('Error parsing token file:', parseError);
-      getAccessToken(oAuth2Client, callback);
-    }
-  });
-}
-
-function getAccessToken(oAuth2Client, callback) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  
-  console.log('Authorize this app by visiting this url:', authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    code = decodeURIComponent(code); 
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error retrieving access token:', err);
-      oAuth2Client.setCredentials(token);
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
-      callback(oAuth2Client);
-    });
-  });
-}
+const SCOPE = [
+  'https://www.googleapis.com/auth/drive.metadata.readonly',
+  'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/drive.file'
+];
 
 function listSubfoldersAndFiles(oAuth2Client, folderId, callback) {
   const drive = google.drive({ version: 'v3', auth: oAuth2Client });
@@ -98,12 +31,16 @@ function listSubfoldersAndFiles(oAuth2Client, folderId, callback) {
 
       const mainFolderData = {
         folderId: folderId,
-        folderName: subfoldersRes.data.files[0].name,
+        folderName: subfoldersRes.data.files.length > 0 ? subfoldersRes.data.files[0].name : '',
         subfolders: [],
       };
 
       const subfolders = subfoldersRes.data.files || [];
       let completedSubfolders = 0;
+
+      if (subfolders.length === 0) {
+        callback(mainFolderData);
+      }
 
       subfolders.forEach((subfolder) => {
         listFilesInSubfolder(drive, subfolder.id, (files) => {
@@ -142,5 +79,44 @@ function listFilesInSubfolder(drive, subfolderId, callback) {
     }
   );
 }
+
+router.get('/getAuthURL', (req, res) => {
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: SCOPE,
+  });
+  return res.send(authUrl);
+});
+
+router.post('/getToken', (req, res) => {
+  if (!req.body.code) {
+    return res.status(400).send('Invalid Request');
+  }
+
+  oAuth2Client.getToken(req.body.code, (err, token) => {
+    if (err) {
+      console.error('Error retrieving access token', err);
+      return res.status(400).send('Error retrieving access token');
+    }
+    res.send(token);
+  });
+});
+
+router.post('/specialTopic/:folderId', (req, res) => {
+  if (!req.body.access_token) {
+    return res.status(400).send('Token not found');
+  }
+
+  const folderId = req.params.folderId;
+
+  if (!folderId) {
+    return res.status(400).send('Folder ID is required');
+  }
+
+  oAuth2Client.setCredentials(req.body.access_token);
+  listSubfoldersAndFiles(oAuth2Client, folderId, (result) => {
+    res.json(result);
+  });
+});
 
 module.exports = router;

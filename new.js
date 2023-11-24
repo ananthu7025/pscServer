@@ -1,7 +1,11 @@
 const express = require('express');
-const router = express.Router();
+const app = express();
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const { google } = require('googleapis');
-const credentials = require('../gd.json');
+const fs = require("fs");
+const formidable = require('formidable');
+const credentials = require('./gd.json');
 
 const client_id = credentials.web.client_id;
 const client_secret = credentials.web.client_secret;
@@ -10,18 +14,24 @@ const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_u
 
 const SCOPE = ['https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.file']
 
-router.get('/getAuthURL', (req, res) => {
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+
+app.get('/getAuthURL', (req, res) => {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPE,
     });
-    console.log(authUrl);
     return res.send(authUrl);
 });
 
-router.post('/getToken', (req, res) => {
+app.post('/getToken', (req, res) => {
     if (req.body.code == null) return res.status(400).send('Invalid Request');
-    oAuth2Client.getToken(req.body.code, (err, token) => {
+    code = decodeURIComponent(req.body.code); 
+
+    oAuth2Client.getToken(code, (err, token) => {
         if (err) {
             console.error('Error retrieving access token', err);
             return res.status(400).send('Error retrieving access token');
@@ -30,7 +40,9 @@ router.post('/getToken', (req, res) => {
     });
 });
 
-router.post('/readDrive/:folderId', (req, res) => {
+
+
+app.post('/readDrive/:folderId', (req, res) => {
     if (req.body.access_token == null) return res.status(400).send('Token not found');
     
     const folderId = req.params.folderId;
@@ -43,7 +55,7 @@ router.post('/readDrive/:folderId', (req, res) => {
     const drive = google.drive({ version: 'v3', auth: oAuth2Client });
 
     drive.files.list({
-        q: `'${folderId}' in parents`,
+        q: `'${folderId}' in parents`, // Set the folder ID as a parent
         pageSize: 10,
     }, (err, response) => {
         if (err) {
@@ -54,6 +66,8 @@ router.post('/readDrive/:folderId', (req, res) => {
         if (files.length) {
             files.map((file) => {
             });
+
+            // Add a web link to each file
             const filesWithLinks = files.map((file) => ({
                 name: file.name,
                 id: file.id,
@@ -63,10 +77,11 @@ router.post('/readDrive/:folderId', (req, res) => {
             res.send(filesWithLinks);
         } else {
             console.log('No files found in the specified folder.');
-            // res.status(400).send(err);
-            res.send([])
+            res.send([]);
         }
     });
 });
 
-module.exports = router;
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server Started ${PORT}`));
