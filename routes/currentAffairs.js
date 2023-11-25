@@ -15,7 +15,6 @@ router.get('/getAuthURL', (req, res) => {
         access_type: 'offline',
         scope: SCOPE,
     });
-    console.log(authUrl);
     return res.send(authUrl);
 });
 
