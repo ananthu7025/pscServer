@@ -46,7 +46,6 @@ router.post('/readDrive/:folderId', (req, res) => {
         pageSize: 10,
     }, (err, response) => {
         if (err) {
-            console.log('The API returned an error: ' + err);
             return res.status(400).send(err);
         }
         const files = response.data.files;
@@ -61,7 +60,6 @@ router.post('/readDrive/:folderId', (req, res) => {
 
             res.send(filesWithLinks);
         } else {
-            console.log('No files found in the specified folder.');
             // res.status(400).send(err);
             res.send([])
         }

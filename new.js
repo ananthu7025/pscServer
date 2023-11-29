@@ -59,7 +59,7 @@ app.post('/readDrive/:folderId', (req, res) => {
         pageSize: 10,
     }, (err, response) => {
         if (err) {
-            console.log('The API returned an error: ' + err);
+            // console.log('The API returned an error: ' + err);
             return res.status(400).send(err);
         }
         const files = response.data.files;
@@ -76,7 +76,7 @@ app.post('/readDrive/:folderId', (req, res) => {
 
             res.send(filesWithLinks);
         } else {
-            console.log('No files found in the specified folder.');
+            // console.log('No files found in the specified folder.');
             res.send([]);
         }
     });

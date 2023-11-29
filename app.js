@@ -23,13 +23,17 @@ const PORT = process.env.PORT || 3030;
 mongoose.connect("mongodb://127.0.0.1:27017/PSC?directConnection=true", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-
+})
+  .then(() => {
+    console.log("Connected to the database");
+  })
+  .catch((err) => {
+    console.error("Error connecting to the database:", err);
+  });
+  
 app.use(bodyParser.json());
 app.use(errorHandler);
 app.use(cors());
-// app.use('/api', fileUploadRoutes);
-
 app.use("/api/user", userRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api', questionRoutes);

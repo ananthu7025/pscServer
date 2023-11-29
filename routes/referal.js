@@ -14,8 +14,8 @@ router.get("/referrals", async (req, res, next) => {
   
       const referralEmails = allReferrals.map(referral => {
         return {
-          referrerEmail: referral.referrer.email,
-          refereeEmail: referral.referee.email
+          referrerEmail: referral?.referrer?.email,
+          refereeEmail: referral?.referee?.email
         };
       });
   

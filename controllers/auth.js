@@ -43,8 +43,8 @@ function generateReferralCode() {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "ananthapadmanabhan7025@gmail.com",
-    pass: "ayoycsctlsajhbbd",
+    user: "pscgreen.learning@gmail.com",
+    pass: "enoq xacj wrwc uvlt",
   },
   tls: {
     rejectUnauthorized: false,
@@ -55,7 +55,7 @@ const OTP_EXPIRY_TIME = 5 * 60 * 1000;
 
 function sendOTPByEmail(email, otp) {
   const mailOptions = {
-    from: "ananthapadmanabhan7025@gmail.com",
+    from: "pscgreen.learning@gmail.com",
     to: email,
     subject: "Your OTP Verification Code",
     html: getEmailTemplate(otp),
@@ -196,6 +196,7 @@ async function createProfile(req, res, next) {
     }
 
     await user.save();
+    sendNewUserEmail(user);
 
     const updatedUser = await User.findById(userId);
 
@@ -204,6 +205,7 @@ async function createProfile(req, res, next) {
     next(error);
   }
 }
+
 
 
 async function resendOTP(req, res, next) {
@@ -311,6 +313,39 @@ async function updateIsPaidStatus(req, res, next) {
     next(error);
   }
 }
+function sendNewUserEmail(user) {
+  const adminEmail = "pscgreen.learning@gmail.com";
+
+  const mailOptions = {
+    from: "pscgreen.learning@gmail.com",
+    to: adminEmail,
+    subject: "New User Registration",
+    html: getNewUserEmailTemplate(user),
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending new user email:", error);
+    } else {
+    }
+  });
+}
+
+function getNewUserEmailTemplate(user) {
+  const templatePath = path.join(__dirname, "../templates", "new-user-template.html");
+
+  try {
+    const emailTemplate = fs.readFileSync(templatePath, "utf-8");
+    return emailTemplate.replace("{{userEmail}}", user.email)
+                       .replace("{{userName}}", user.name)
+                       .replace("{{userPhone}}", user.phone)
+                       .replace("{{userDistrict}}", user.district);
+  } catch (error) {
+    console.error("Error reading new user email template:", error);
+    return "";
+  }
+}
+
 module.exports = {
   registerUser,
   verifyOTP,
