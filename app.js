@@ -19,7 +19,7 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3030;
 
-mongoose.connect("mongodb://127.0.0.1:27017/PSC?directConnection=true", {
+mongoose.connect("mongodb+srv://pscgreenlearning:pscgreen@pscgreen.m19r6fm.mongodb.net/", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
