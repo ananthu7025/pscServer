@@ -1,0 +1,35 @@
+{
+  "files": {
+    "main.css": "/static/css/main.13d2e075.css",
+    "main.js": "/static/js/main.42fa4a9a.js",
+    "static/js/787.d5fa4d18.chunk.js": "/static/js/787.d5fa4d18.chunk.js",
+    "static/media/create kerala t 0.png": "/static/media/create kerala t 0.abdcf2808601ba1b7740.png",
+    "static/media/qr.jpg": "/static/media/qr.7af58fea0843fd242e85.jpg",
+    "static/media/logo.jpg": "/static/media/logo.4579b956f9bd7777ad9b.jpg",
+    "static/media/empty.jpg": "/static/media/empty.d02f65c2e3ad5c75c7cf.jpg",
+    "static/media/about-banner.jpg": "/static/media/about-banner.2239cc5086391d25e396.jpg",
+    "static/media/illust01.webp": "/static/media/illust01.a91c63fe68c229ede965.webp",
+    "static/media/illust02.webp": "/static/media/illust02.5db77ad5c51db6e3b43b.webp",
+    "static/media/hero-banner-1.jpg": "/static/media/hero-banner-1.398b025a0795392a9d02.jpg",
+    "static/media/hero-banner-2.jpg": "/static/media/hero-banner-2.bca8a0ce222c1dc46e00.jpg",
+    "static/media/illust03.webp": "/static/media/illust03.d5abef25a6a323040093.webp",
+    "static/media/hero-shape-1.svg": "/static/media/hero-shape-1.eab2d931933babefa7a5a661b6d96f82.svg",
+    "static/media/hero-shape-2.png": "/static/media/hero-shape-2.bea99ea31058a3f8f021.png",
+    "static/media/about-shape-2.svg": "/static/media/about-shape-2.361bd7abea265db81a81f4ba5147c388.svg",
+    "static/media/category-2.svg": "/static/media/category-2.61a628182c04175d719f66a45e27e5da.svg",
+    "static/media/avatar.avif": "/static/media/avatar.5080869e0917a75c67f4.avif",
+    "static/media/category-1.svg": "/static/media/category-1.19210e9f6063b7afd9fe932f95251d41.svg",
+    "static/media/category-3.svg": "/static/media/category-3.5a4007296dbd037020cb221712dd4f21.svg",
+    "static/media/category-4.svg": "/static/media/category-4.90e6914044e07065fd776282067387cc.svg",
+    "index.html": "/index.html",
+    "static/media/down-arrow-svgrepo-com.svg": "/static/media/down-arrow-svgrepo-com.877f555aabca7c704ea14e14c46f4079.svg",
+    "static/media/about-shape-4.svg": "/static/media/about-shape-4.f444c3b655e0585750b1f9c7e6e95f3d.svg",
+    "main.13d2e075.css.map": "/static/css/main.13d2e075.css.map",
+    "main.42fa4a9a.js.map": "/static/js/main.42fa4a9a.js.map",
+    "787.d5fa4d18.chunk.js.map": "/static/js/787.d5fa4d18.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.13d2e075.css",
+    "static/js/main.42fa4a9a.js"
+  ]
+}
