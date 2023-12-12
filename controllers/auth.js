@@ -54,6 +54,7 @@ const transporter = nodemailer.createTransport({
 const OTP_EXPIRY_TIME = 5 * 60 * 1000; 
 
 function sendOTPByEmail(email, otp) {
+  console.log(otp)
   const mailOptions = {
     from: "pscgreen.learning@gmail.com",
     to: email,
@@ -65,6 +66,7 @@ function sendOTPByEmail(email, otp) {
     if (error) {
       console.error("Error sending OTP:", error);
     } else {
+      console.log(info)
     }
   });
 }
