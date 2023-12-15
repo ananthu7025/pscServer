@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   name: String,
   district: String,
   isCreated: Boolean,
-  referralCode: { type: String, unique: true }, 
+  referralCode: { type: String }, 
   isAdmin: { type: Boolean,default: false }, 
 });
 

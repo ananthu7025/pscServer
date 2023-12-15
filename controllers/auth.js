@@ -95,7 +95,7 @@ async function registerUser(req, res, next) {
       user.otp = otp;
       user.otpCreatedAt = otpCreatedAt;
     } else {
-      user = new User({ email, otp, isVerified: false, otpCreatedAt,isCreated:false });
+      user = new User({ email, otp, isVerified: false, otpCreatedAt,isCreated:false,referralCode:null });
     }
 
     await user.save();
