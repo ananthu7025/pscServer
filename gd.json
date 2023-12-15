@@ -1,16 +1,12 @@
 {
-    "web": {
-        "client_id": "645122961954-5nl5d0ep47hk6arporvomcdl5rs3qrn5.apps.googleusercontent.com",
-        "project_id": "psc-green-404607",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret": "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",
-        "redirect_uris": [
-            "http://localhost:3030"
-        ],
-        "javascript_origins": [
-            "http://localhost:3030"
-        ]
-    }
+  "web": {
+    "client_id": "645122961954-5nl5d0ep47hk6arporvomcdl5rs3qrn5.apps.googleusercontent.com",
+    "project_id": "psc-green-404607",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "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",
+    "redirect_uris": ["https://pscgreen.com", "https://www.pscgreen.com"],
+    "javascript_origins": ["https://pscgreen.com", "https://www.pscgreen.com"]
+  }
 }
