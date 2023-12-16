@@ -18,4 +18,4 @@ jobs:
           mkdir -p ~/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP_ADDRESS }} 'cd pscServer && git pull origin uat && npm install && pm2 restart psc-server'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_IP_ADDRESS }} 'cd pscServer && git checkout uat && git pull origin uat && npm install && pm2 restart psc-server'
