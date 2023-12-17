@@ -66,7 +66,7 @@ function sendOTPByEmail(email, otp) {
     if (error) {
       console.error("Error sending OTP:", error);
     } else {
-      // console.log(info)
+      console.log(info)
     }
   });
 }
