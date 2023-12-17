@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/static/css/main.c4f0b40b.css",
-    "main.js": "/static/js/main.8149ab39.js",
+    "main.js": "/static/js/main.384279a3.js",
     "static/js/787.d5fa4d18.chunk.js": "/static/js/787.d5fa4d18.chunk.js",
     "static/media/create kerala t 0.png": "/static/media/create kerala t 0.abdcf2808601ba1b7740.png",
     "static/media/qr.jpg": "/static/media/qr.7af58fea0843fd242e85.jpg",
-    "static/media/logo.jpg": "/static/media/logo.4579b956f9bd7777ad9b.jpg",
     "static/media/empty.jpg": "/static/media/empty.d02f65c2e3ad5c75c7cf.jpg",
+    "static/media/logo.jpg": "/static/media/logo.a113698bfc410190c438.jpg",
     "static/media/about-banner.jpg": "/static/media/about-banner.2239cc5086391d25e396.jpg",
     "static/media/illust01.webp": "/static/media/illust01.a91c63fe68c229ede965.webp",
     "static/media/illust02.webp": "/static/media/illust02.5db77ad5c51db6e3b43b.webp",
@@ -25,11 +25,11 @@
     "static/media/down-arrow-svgrepo-com.svg": "/static/media/down-arrow-svgrepo-com.877f555aabca7c704ea14e14c46f4079.svg",
     "static/media/about-shape-4.svg": "/static/media/about-shape-4.f444c3b655e0585750b1f9c7e6e95f3d.svg",
     "main.c4f0b40b.css.map": "/static/css/main.c4f0b40b.css.map",
-    "main.8149ab39.js.map": "/static/js/main.8149ab39.js.map",
+    "main.384279a3.js.map": "/static/js/main.384279a3.js.map",
     "787.d5fa4d18.chunk.js.map": "/static/js/787.d5fa4d18.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c4f0b40b.css",
-    "static/js/main.8149ab39.js"
+    "static/js/main.384279a3.js"
   ]
 }

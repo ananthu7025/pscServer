@@ -66,7 +66,7 @@ function sendOTPByEmail(email, otp) {
     if (error) {
       console.error("Error sending OTP:", error);
     } else {
-      console.log(info)
+      // console.log(info)
     }
   });
 }
@@ -85,10 +85,13 @@ function getEmailTemplate(otp) {
 
 async function registerUser(req, res, next) {
   const { email } = req.body;
+  console.log(email,"email i enterrd")
   const otp = generateRandomNumber(1000, 9999);
   const otpCreatedAt = new Date(); 
 
   try {
+    const allUsers = await User.find({}, 'email');
+    console.log('All emails in the collection:', allUsers.map(user => user.email));
     let user = await User.findOne({ email });
 
     if (user) {
@@ -137,6 +140,7 @@ async function verifyOTP(req, res, next) {
       }
 
       if (!user.referralCode) {
+        console.log("inside")
         user.referralCode = generateReferralCode();
       }
 
