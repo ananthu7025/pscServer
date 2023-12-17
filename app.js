@@ -45,6 +45,9 @@ app.use('/api', folderFech);
 app.use('/api', studyPlan);
 app.use('/api', categoryRoutes);
 app.use('/api', subcategoryRoutes);
+app.get('/api/abhi/test', function(req, res) {
+  res.send('test Workflow success');
+});
 app.get('/*', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/build', 'index.html'));
 });
