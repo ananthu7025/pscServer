@@ -7,6 +7,39 @@ const fs = require("fs");
 const path = require("path");
 
 
+
+async function registerUser(req, res, next) {
+  const { email } = req.body;
+  console.log(email, "email i entered");
+  const otp = generateRandomNumber(1000, 9999);
+  const otpCreatedAt = new Date();
+
+  try {
+    const allUsers = await User.find({}, 'email');
+    console.log('All emails in the collection:', allUsers.map(user => user.email));
+    
+    // Changed 'const' to 'let' in the following line
+    let user = await User.findOne({ email: email });
+    
+    if (user) {
+      user.otp = otp;
+      user.otpCreatedAt = otpCreatedAt;
+    } else {
+      user = new User({ email, otp, isVerified: false, otpCreatedAt, isCreated: false });
+    }
+
+    await user.save();
+    sendOTPByEmail(email, otp);
+
+    res.status(201).send({
+      message: "OTP sent. Check your email for OTP.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 function verifyAccessToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -83,34 +116,7 @@ function getEmailTemplate(otp) {
   }
 }
 
-async function registerUser(req, res, next) {
-  const { email } = req.body;
-  console.log(email,"email i enterrd")
-  const otp = generateRandomNumber(1000, 9999);
-  const otpCreatedAt = new Date(); 
 
-  try {
-    const allUsers = await User.find({}, 'email');
-    console.log('All emails in the collection:', allUsers.map(user => user.email));
-    let user = await User.findOne({ email });
-
-    if (user) {
-      user.otp = otp;
-      user.otpCreatedAt = otpCreatedAt;
-    } else {
-      user = new User({ email, otp, isVerified: false, otpCreatedAt,isCreated:false });
-    }
-
-    await user.save();
-    sendOTPByEmail(email, otp);
-
-   res.status(201).send({
-          message: "OTP sent. Check your email for OTP.",
-        });
-  } catch (error) {
-    next(error);
-  }
-}
 
 
 
