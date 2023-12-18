@@ -52,6 +52,7 @@ router.post('/readDrive/:folderId', (req, res) => {
         pageSize: 10,
     }, (err, response) => {
         if (err) {
+            res.send([])
             return res.status(400).send(err);
         }
         const files = response.data.files;
