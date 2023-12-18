@@ -24,7 +24,7 @@ router.post('/getToken', (req, res) => {
     oAuth2Client.getToken(req.body.code, (err, token) => {
         if (err) {
             console.error('Error retrieving access token', err);
-            return res.status(400).send('Error retrieving access token');
+            return         res.status(500).send('Internal Server Error');
         }
         res.send(token);
     });
@@ -36,7 +36,7 @@ router.post('/studyplan/:folderId', async (req, res) => {
     const folderId = req.params.folderId;
 
     if (!folderId) {
-        return res.status(400).send('Folder ID is required');
+        return         res.status(500).send('Internal Server Error');
     }
 
     oAuth2Client.setCredentials(req.body.access_token);
@@ -76,7 +76,7 @@ async function fetchDriveItems(oAuth2Client, folderId) {
     return structuredFolders;
   } catch (error) {
     console.error('Error fetching Google Drive data: ', error);
-    throw new Error('Error fetching Google Drive data');
+    res.status(500).send('Internal Server Error');
   }
 }
 
@@ -90,7 +90,7 @@ async function fetchSubfolders(drive, folderId) {
     return response.data.files || [];
   } catch (error) {
     console.error('Error fetching subfolders: ', error);
-    throw new Error('Error fetching subfolders');
+    res.status(500).send('Internal Server Error');
   }
 }
 
@@ -111,7 +111,7 @@ async function fetchFiles(drive, folderId) {
     return filesWithWebContentLink;
   } catch (error) {
     console.error('Error fetching files: ', error);
-    throw new Error('Error fetching files');
+    res.status(500).send('Internal Server Error');
   }
 }
 

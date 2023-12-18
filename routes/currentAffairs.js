@@ -19,29 +19,29 @@ router.get('/getAuthURL', (req, res) => {
         });
         return res.send(authUrl);
     } catch (error) {
-        res.send(400).send("Err")
+        res.status(500).send('Internal Server Error');
     }
    
 });
 
 router.post('/getToken', (req, res) => {
-    if (req.body.code == null) return res.status(400).send('Invalid Request');
+    if (req.body.code == null) return         res.status(500).send('Internal Server Error');
     oAuth2Client.getToken(req.body.code, (err, token) => {
         if (err) {
             console.error('Error retrieving access token', err);
-            return res.status(400).send('Error retrieving access token');
+            return res.status(500).send('Internal Server Error');
         }
         res.send(token);
     });
 });
 
 router.post('/readDrive/:folderId', (req, res) => {
-    if (req.body.access_token == null) return res.status(400).send('Token not found');
+    if (req.body.access_token == null) return         res.status(500).send('Internal Server Error');
     
     const folderId = req.params.folderId;
 
     if (!folderId) {
-        return res.status(400).send('Folder ID is missing');
+        return         res.status(500).send('Internal Server Error');
     }
 
     oAuth2Client.setCredentials(req.body.access_token);
@@ -53,7 +53,7 @@ router.post('/readDrive/:folderId', (req, res) => {
     }, (err, response) => {
         if (err) {
             res.send([])
-            return res.status(400).send(err);
+            return         res.status(500).send('Internal Server Error');
         }
         const files = response.data.files;
         if (files.length) {
