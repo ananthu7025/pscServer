@@ -22,7 +22,7 @@ function listSubfoldersAndFiles(oAuth2Client, folderId, callback) {
     (subfoldersErr, subfoldersRes) => {
       if (subfoldersErr) {
         console.error('Error retrieving subfolders:', subfoldersErr);
-        return callback({ error: 'Error retrieving subfolders' });
+        return         res.status(500).send('Internal Server Error');
       }
 
       const mainFolderData = {
@@ -67,7 +67,7 @@ function listFilesInSubfolder(drive, subfolderId, callback) {
     (filesErr, filesRes) => {
       if (filesErr) {
         console.error('Error retrieving files:', filesErr);
-        return callback({ error: 'Error retrieving files' });
+        return         res.status(500).send('Internal Server Error');
       }
 
       const files = filesRes.data.files || [];
@@ -86,13 +86,13 @@ router.get('/getAuthURL', (req, res) => {
 
 router.post('/getToken', (req, res) => {
   if (!req.body.code) {
-    return res.status(400).send('Invalid Request');
+    return         res.status(500).send('Internal Server Error');
   }
 
   oAuth2Client.getToken(req.body.code, (err, token) => {
     if (err) {
       console.error('Error retrieving access token', err);
-      return res.status(400).send('Error retrieving access token');
+      return         res.status(500).send('Internal Server Error');
     }
     res.send(token);
   });
@@ -100,13 +100,13 @@ router.post('/getToken', (req, res) => {
 
 router.post('/specialTopic/:folderId', (req, res) => {
   if (!req.body.access_token) {
-    return res.status(400).send('Token not found');
+    return         res.status(500).send('Internal Server Error');
   }
 
   const folderId = req.params.folderId;
 
   if (!folderId) {
-    return res.status(400).send('Folder ID is required');
+    return         res.status(500).send('Internal Server Error');
   }
 
   oAuth2Client.setCredentials(req.body.access_token);
