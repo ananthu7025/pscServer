@@ -49,7 +49,7 @@ router.post('/readDrive/:folderId', (req, res) => {
 
     drive.files.list({
         q: `'${folderId}' in parents`,
-        pageSize: 10,
+        pageSize: 50,
     }, (err, response) => {
         if (err) {
             res.send([])
