@@ -17,10 +17,7 @@ async function registerUser(req, res, next) {
   try {
     const allUsers = await User.find({}, 'email');
     console.log('All emails in the collection:', allUsers.map(user => user.email));
-    
-    // Changed 'const' to 'let' in the following line
     let user = await User.findOne({ email: email });
-    
     if (user) {
       user.otp = otp;
       user.otpCreatedAt = otpCreatedAt;
