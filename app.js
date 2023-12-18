@@ -13,6 +13,7 @@ const folderFech = require('./routes/folderFetch');
 const studyPlan = require('./routes/studyPlan');
 const categoryRoutes = require('./routes/catogorey');
 const subcategoryRoutes = require('./routes/subcatogorey');
+const pdfRoutes = require('./routes/pdfFech');
 const path = require('path');
 const errorHandler = require("./errorHandler");
 const cors = require("cors");
@@ -45,6 +46,8 @@ app.use('/api', folderFech);
 app.use('/api', studyPlan);
 app.use('/api', categoryRoutes);
 app.use('/api', subcategoryRoutes);
+app.use('/api', pdfRoutes);
+
 app.get('/api/abhi/test', function(req, res) {
   res.send('test Workflow success');
 });
