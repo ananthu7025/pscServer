@@ -67,7 +67,6 @@ router.post('/readDrive/:folderId', (req, res) => {
 
             res.send(filesWithLinks);
         } else {
-            res.status(400).send(err);
             res.send([])
         }
     });
