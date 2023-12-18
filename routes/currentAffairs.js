@@ -41,7 +41,7 @@ router.post('/readDrive/:folderId', (req, res) => {
     const folderId = req.params.folderId;
 
     if (!folderId) {
-        return res.status(400).send('Folder ID is required');
+        return res.status(400).send('Folder ID is missing');
     }
 
     oAuth2Client.setCredentials(req.body.access_token);
