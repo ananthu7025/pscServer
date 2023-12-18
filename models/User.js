@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  email: String,
+  email: { type: String, unique: true },
   otp: String,
   isVerified: Boolean,
   isPaid: { type: Boolean, default: false },
@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   name: String,
   district: String,
   isCreated: Boolean,
-  referralCode: { type: String }, 
+  referralCode: String, 
   isAdmin: { type: Boolean,default: false }, 
 });
 
