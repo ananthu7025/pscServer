@@ -85,40 +85,32 @@ function getEmailTemplate(otp) {
 
 async function registerUser(req, res, next) {
   const { email } = req.body;
-  console.log(email, "email i entered");
+  console.log(email,"email i enterrd")
+  const otp = generateRandomNumber(1000, 9999);
+  const otpCreatedAt = new Date(); 
 
   try {
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.status(400).send({
-        message: "User with this email already exists. If you forgot your password, you can reset it.",
-      });
-    }
-
-    const otp = generateRandomNumber(1000, 9999);
-    const otpCreatedAt = new Date();
-
+    const allUsers = await User.find({}, 'email');
+    console.log('All emails in the collection:', allUsers.map(user => user.email));
     let user = await User.findOne({ email });
 
     if (user) {
       user.otp = otp;
       user.otpCreatedAt = otpCreatedAt;
     } else {
-      user = new User({ email, otp, isVerified: false, otpCreatedAt, isCreated: false });
+      user = new User({ email, otp, isVerified: false, otpCreatedAt,isCreated:false });
     }
 
     await user.save();
     sendOTPByEmail(email, otp);
 
-    res.status(201).send({
-      message: "OTP sent. Check your email for OTP.",
-    });
+   res.status(201).send({
+          message: "OTP sent. Check your email for OTP.",
+        });
   } catch (error) {
     next(error);
   }
 }
-
 
 
 
