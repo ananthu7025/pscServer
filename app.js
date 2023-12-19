@@ -10,10 +10,15 @@ const referralRoutes = require('./routes/referal');
 const userRoutesAdmin = require('./routes/admin');
 const CurrentAffairs = require('./routes/currentAffairs');
 const folderFech = require('./routes/folderFetch');
-const studyPlan = require('./routes/studyPlan');
+const specialTopic = require('./routes/specialTopic');
 const categoryRoutes = require('./routes/catogorey');
 const subcategoryRoutes = require('./routes/subcatogorey');
-const pdfRoutes = require('./routes/pdfFech');
+const  studyplan= require('./routes/studyplan');
+const  ExamRoute= require('./routes/examcalnder');
+const  pscbulletRoute= require('./routes/pscbullet');
+
+
+
 const path = require('path');
 const errorHandler = require("./errorHandler");
 const cors = require("cors");
@@ -43,10 +48,15 @@ app.use('/api', referralRoutes);
 app.use('/api/admin/users', userRoutesAdmin);
 app.use('/api', CurrentAffairs);
 app.use('/api', folderFech);
-app.use('/api', studyPlan);
+app.use('/api', specialTopic);
 app.use('/api', categoryRoutes);
 app.use('/api', subcategoryRoutes);
-app.use('/api', pdfRoutes);
+app.use('/api', studyplan);
+app.use('/api', ExamRoute);
+app.use('/api', pscbulletRoute);
+
+
+
 
 app.get('/api/abhi/test', function(req, res) {
   res.send('test Workflow success');

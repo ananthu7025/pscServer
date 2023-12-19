@@ -1,118 +1,85 @@
 const express = require('express');
 const router = express.Router();
-const { google } = require('googleapis');
-const credentials = require('../gd.json');
-const { OAuth2Client } = require('google-auth-library');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 
-const client_id = credentials.web.client_id;
-const client_secret = credentials.web.client_secret;
-const redirect_uris = credentials.web.redirect_uris;
-const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+const currentAffairsFolder = path.join(__dirname, '../SPECIAL TOPIC');
 
-const SCOPE = ['https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.file']
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        console.log("trigger")
+        try {
+            const subfolder = req.query.subfolder || '';
+            const subfolderPath = path.join(currentAffairsFolder, subfolder);
+            if (!fs.existsSync(subfolderPath) || !fs.statSync(subfolderPath).isDirectory()) {
+                fs.mkdirSync(subfolderPath, { recursive: true });
+            }
 
-router.get('/getAuthURL', (req, res) => {
-    const authUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPE,
-    });
-    return res.send(authUrl);
-});
-
-router.post('/getToken', (req, res) => {
-    if (req.body.code == null) return res.status(400).send('Invalid Request');
-    oAuth2Client.getToken(req.body.code, (err, token) => {
-        if (err) {
-            console.error('Error retrieving access token', err);
-            return         res.status(500).send('Internal Server Error');
+            cb(null, subfolderPath);
+        } catch (error) {
+            console.error(error);
+            cb(error, null);
         }
-        res.send(token);
-    });
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
 });
 
-router.post('/studyplan/:folderId', async (req, res) => {
-    if (req.body.access_token == null) return res.status(400).send('Token not found');
-    
-    const folderId = req.params.folderId;
+const upload = multer({ storage });
 
-    if (!folderId) {
-        return         res.status(500).send('Internal Server Error');
-    }
-
-    oAuth2Client.setCredentials(req.body.access_token);
+router.get('/Study_plan', (req, res) => {
     try {
-        const structuredFolders = await fetchDriveItems(oAuth2Client, folderId);
-        res.json(structuredFolders);
+        const subfolders = fs.readdirSync(currentAffairsFolder);
+        const folderData = [];
+
+        subfolders.forEach(subfolder => {
+            const subfolderPath = path.join(currentAffairsFolder, subfolder);
+            const pdfFiles = fs.readdirSync(subfolderPath).filter(file => file.toLowerCase().endsWith('.pdf'));
+            folderData.push({ subfolder, pdfFiles });
+        });
+
+        res.json({ folders: folderData });
     } catch (error) {
-        console.error('Error in studyplan route: ', error);
-        res.status(500).send('Internal Server Error');
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
-async function fetchDriveItems(oAuth2Client, folderId) {
-  const drive = google.drive({ version: 'v3', auth: oAuth2Client });
+router.get('/Study_plan/pdfs/:subfolder/:filename', (req, res) => {
+    try {
+        const subfolder = req.params.subfolder;
+        const filename = req.params.filename;
+        const filePath = path.join(currentAffairsFolder, subfolder, filename);
 
-  try {
-    const response = await drive.files.list({
-      q: `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder'`,
-      fields: 'files(id, name, webContentLink)',
-    });
+        if (fs.existsSync(filePath) && path.extname(filePath).toLowerCase() === '.pdf') {
+            const sanitizedFilename = encodeURIComponent(filename);
+            res.setHeader('Content-Disposition', `attachment; filename=${sanitizedFilename}`);
 
-    const mainFolders = response.data.files || [];
 
-    const structuredFolders = await Promise.all(mainFolders.map(async (mainFolder) => {
-      const subfolders = await fetchSubfolders(drive, mainFolder.id);
-      const subfoldersWithFiles = await Promise.all(subfolders.map(async (subfolder) => {
-        const files = await fetchFiles(drive, subfolder.id);
-        return { name: subfolder.name, files: files };
-      }));
-
-      return {
-        name: mainFolder.name,
-        subfolders: subfoldersWithFiles,
-      };
-    }));
-
-    return structuredFolders;
-  } catch (error) {
-    console.error('Error fetching Google Drive data: ', error);
-    res.status(500).send('Internal Server Error');
-  }
-}
-
-async function fetchSubfolders(drive, folderId) {
-  try {
-    const response = await drive.files.list({
-      q: `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder'`,
-      fields: 'files(id, name, webContentLink)',
-    });
-
-    return response.data.files || [];
-  } catch (error) {
-    console.error('Error fetching subfolders: ', error);
-    res.status(500).send('Internal Server Error');
-  }
-}
-
-async function fetchFiles(drive, folderId) {
-  try {
-    const response = await drive.files.list({
-      q: `'${folderId}' in parents`,
-      fields: 'files(id, name, webContentLink)',
-    });
-
-    const files = response.data.files || [];
-
-    const filesWithWebContentLink = files.map(file => ({
-      name: file.name,
-      webContentLink: file.webContentLink
-    }));
-
-    return filesWithWebContentLink;
-  } catch (error) {
-    console.error('Error fetching files: ', error);
-    res.status(500).send('Internal Server Error');
-  }
-}
+            const fileStream = fs.createReadStream(filePath);
+            fileStream.pipe(res);
+        } else {
+            res.status(404).json({ error: 'File not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        console.log(error)
+    }
+});
+router.post('/Study_plan/upload', upload.single('pdf'), (req, res) => {
+    console.log('Received file upload request');
+    try {
+        const subfolder = req.query.subfolder || '';
+        const subfolderPath = path.join(currentAffairsFolder, subfolder);
+        if (!fs.existsSync(subfolderPath) || !fs.statSync(subfolderPath).isDirectory()) {
+            fs.mkdirSync(subfolderPath, { recursive: true });
+        }
+        res.json({ success: true, message: 'File uploaded successfully' });
+    } catch (error) {
+        console.error(error);
+    }
+});
 
 module.exports = router;
