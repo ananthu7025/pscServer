@@ -1,75 +1,85 @@
 const express = require('express');
 const router = express.Router();
-const { google } = require('googleapis');
-const credentials = require('../gd.json');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 
-const client_id = credentials.web.client_id;
-const client_secret = credentials.web.client_secret;
-const redirect_uris = credentials.web.redirect_uris;
-const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-const SCOPE = ['https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.file']
-  
-  
+const currentAffairsFolder = path.join(__dirname, '../CURRENT AFFAIRS');
 
-router.get('/getAuthURL', (req, res) => {
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        try {
+            const subfolder = req.query.subfolder || '';
+            const subfolderPath = path.join(currentAffairsFolder, subfolder);
+            if (!fs.existsSync(subfolderPath) || !fs.statSync(subfolderPath).isDirectory()) {
+                fs.mkdirSync(subfolderPath, { recursive: true });
+            }
+
+            cb(null, subfolderPath);
+        } catch (error) {
+            console.error(error);
+            cb(error, null);
+        }
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
+});
+
+const upload = multer({ storage });
+
+router.get('/current_affairs', (req, res) => {
     try {
-        const authUrl = oAuth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: SCOPE,
+        const subfolders = fs.readdirSync(currentAffairsFolder);
+        const folderData = [];
+
+        subfolders.forEach(subfolder => {
+            const subfolderPath = path.join(currentAffairsFolder, subfolder);
+            const pdfFiles = fs.readdirSync(subfolderPath).filter(file => file.toLowerCase().endsWith('.pdf'));
+            folderData.push({ subfolder, pdfFiles });
         });
-        return res.send(authUrl);
+
+        res.json({ folders: folderData });
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-   
 });
 
-router.post('/getToken', (req, res) => {
-    if (req.body.code == null) return         res.status(500).send('Internal Server Error');
-    oAuth2Client.getToken(req.body.code, (err, token) => {
-        if (err) {
-            console.error('Error retrieving access token', err);
-            return res.status(500).send('Internal Server Error');
-        }
-        res.send(token);
-    });
-});
+router.get('/pdfs/:subfolder/:filename', (req, res) => {
+    try {
+        const subfolder = req.params.subfolder;
+        const filename = req.params.filename;
+        const filePath = path.join(currentAffairsFolder, subfolder, filename);
 
-router.post('/readDrive/:folderId', (req, res) => {
-    if (req.body.access_token == null) return         res.status(500).send('Internal Server Error');
-    
-    const folderId = req.params.folderId;
+        if (fs.existsSync(filePath) && path.extname(filePath).toLowerCase() === '.pdf') {
+            const sanitizedFilename = encodeURIComponent(filename);
+            res.setHeader('Content-Disposition', `attachment; filename=${sanitizedFilename}`);
 
-    if (!folderId) {
-        return         res.status(500).send('Internal Server Error');
-    }
 
-    oAuth2Client.setCredentials(req.body.access_token);
-    const drive = google.drive({ version: 'v3', auth: oAuth2Client });
-
-    drive.files.list({
-        q: `'${folderId}' in parents`,
-        pageSize: 50,
-    }, (err, response) => {
-        if (err) {
-            res.send([])
-            return         res.status(500).send('Internal Server Error');
-        }
-        const files = response.data.files;
-        if (files.length) {
-            files.map((file) => {
-            });
-            const filesWithLinks = files.map((file) => ({
-                name: file.name,
-                id: file.id,
-                webLink: `https://drive.google.com/file/d/${file.id}/view`,
-            }));
-
-            res.send(filesWithLinks);
+            const fileStream = fs.createReadStream(filePath);
+            fileStream.pipe(res);
         } else {
-            res.send([])
+            res.status(404).json({ error: 'File not found' });
         }
-    });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        console.log(error)
+    }
+});
+
+router.post('/upload', upload.single('pdf'), (req, res) => {
+    try {
+        const subfolder = req.query.subfolder || '';
+        const subfolderPath = path.join(currentAffairsFolder, subfolder);
+        if (!fs.existsSync(subfolderPath) || !fs.statSync(subfolderPath).isDirectory()) {
+            fs.mkdirSync(subfolderPath, { recursive: true });
+        }
+        res.json({ success: true, message: 'File uploaded successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 module.exports = router;
