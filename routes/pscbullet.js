@@ -6,32 +6,6 @@ const multer = require('multer');
 
 const currentAffairsFolder = path.join(__dirname, '../PSC BULLETTIN');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        try {
-            const { month, subfolder } = req.body; // assuming you send month and subfolder in the request body
-
-            // Customize your folder structure here
-            const destinationFolder = path.join(currentAffairsFolder, month, subfolder);
-
-            if (!fs.existsSync(destinationFolder) || !fs.statSync(destinationFolder).isDirectory()) {
-                fs.mkdirSync(destinationFolder, { recursive: true });
-            }
-
-            cb(null, destinationFolder);
-        } catch (error) {
-            console.error(error);
-            cb(error, null);
-        }
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
-    },
-});
-
-
-const upload = multer({ storage });
-
 router.get('/subfolders', (req, res) => {
     try {
         const mainSubfolders = fs.readdirSync(currentAffairsFolder);
@@ -87,19 +61,25 @@ router.get('/pscbullet_download/:month/:subfolder/:fileName', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-router.post('/upload_pscbullet', upload.single('pdf'), (req, res) => {
-    try {
-        const subfolder = req.query.subfolder || '';
-        const subfolderPath = path.join(currentAffairsFolder, subfolder);
-        if (!fs.existsSync(subfolderPath) || !fs.statSync(subfolderPath).isDirectory()) {
-            fs.mkdirSync(subfolderPath, { recursive: true });
-        }
-        res.json({ success: true, message: 'File uploaded successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const { year, month } = req.params;
+    const uploadPath = path.join(currentAffairsFolder, year, month);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
+
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
 });
+
+const upload = multer({ storage });
+
+router.post('/psc_bullet_upload/:year/:month', upload.single('pdf'), (req, res) => {
+    res.send('File uploaded successfully!');
+  });
 
 module.exports = router;
