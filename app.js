@@ -13,7 +13,7 @@ const folderFech = require('./routes/folderFetch');
 const specialTopic = require('./routes/specialTopic');
 const categoryRoutes = require('./routes/catogorey');
 const subcategoryRoutes = require('./routes/subcatogorey');
-const  studyplan= require('./routes/studyplan');
+// const  studyplan= require('./routes/studyplan');
 const  ExamRoute= require('./routes/examcalnder');
 const  pscbulletRoute= require('./routes/pscbullet');
 
@@ -51,7 +51,7 @@ app.use('/api', folderFech);
 app.use('/api', specialTopic);
 app.use('/api', categoryRoutes);
 app.use('/api', subcategoryRoutes);
-app.use('/api', studyplan);
+// app.use('/api', studyplan);
 app.use('/api', ExamRoute);
 app.use('/api', pscbulletRoute);
 
