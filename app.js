@@ -16,6 +16,8 @@ const subcategoryRoutes = require('./routes/subcatogorey');
 const  ExamRoute= require('./routes/examcalnder');
 const  pscbulletRoute= require('./routes/pscbullet');
 const  previousYearRoute= require('./routes/previousyear');
+const  SCRTROUTE= require('./routes/scrt');
+
 
 const path = require('path');
 const errorHandler = require("./errorHandler");
@@ -52,6 +54,8 @@ app.use('/api', subcategoryRoutes);
 app.use('/api', ExamRoute);
 app.use('/api', pscbulletRoute);
 app.use('/api', previousYearRoute);
+app.use('/api', SCRTROUTE);
+
 
 
 
