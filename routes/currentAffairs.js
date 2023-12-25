@@ -42,7 +42,7 @@ router.get('/current_affairs', (req, res) => {
         res.json({ folders: folderData });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error',error });
+        res.status(500).json({ error: 'Internal Server Error in this',error });
     }
 });
 
