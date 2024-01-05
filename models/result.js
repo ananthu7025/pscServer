@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
 
+const questionSchema = new mongoose.Schema({
+  questionID: { type: mongoose.Schema.Types.ObjectId, ref: 'Question' },
+  userSelectedOption: String,
+});
+
 const resultSchema = new mongoose.Schema(
   {
-    userID: mongoose.Schema.Types.ObjectId,
+    userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     score: Number,
+    questions: [questionSchema],
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
