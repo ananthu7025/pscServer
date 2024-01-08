@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.9b95a193.css",
-    "main.js": "/static/js/main.c2e84f84.js",
+    "main.js": "/static/js/main.4a607f29.js",
     "static/js/787.d5fa4d18.chunk.js": "/static/js/787.d5fa4d18.chunk.js",
     "static/media/create kerala t 0.png": "/static/media/create kerala t 0.abdcf2808601ba1b7740.png",
     "static/media/empty.jpg": "/static/media/empty.d02f65c2e3ad5c75c7cf.jpg",
@@ -26,11 +26,11 @@
     "static/media/down-arrow-svgrepo-com.svg": "/static/media/down-arrow-svgrepo-com.877f555aabca7c704ea14e14c46f4079.svg",
     "static/media/about-shape-4.svg": "/static/media/about-shape-4.f444c3b655e0585750b1f9c7e6e95f3d.svg",
     "main.9b95a193.css.map": "/static/css/main.9b95a193.css.map",
-    "main.c2e84f84.js.map": "/static/js/main.c2e84f84.js.map",
+    "main.4a607f29.js.map": "/static/js/main.4a607f29.js.map",
     "787.d5fa4d18.chunk.js.map": "/static/js/787.d5fa4d18.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9b95a193.css",
-    "static/js/main.c2e84f84.js"
+    "static/js/main.4a607f29.js"
   ]
 }
